@@ -156,7 +156,7 @@ async def editdata() -> None:
     edit_data_dialog.open()
 
 
-# Buttons
+# CRUD Buttons
 with ui.row() as button_row:
     ui.button("Add", color="green", on_click=lambda e: opendata(e))
     ui.button("Edit", on_click=editdata)
