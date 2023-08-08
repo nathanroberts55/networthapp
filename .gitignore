@@ -204,4 +204,7 @@ pip-selfcheck.json
 .history
 .ionide
 
+# Project Specific
+networth.db
+
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,venv
