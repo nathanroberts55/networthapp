@@ -63,7 +63,7 @@ def create_line_item(name: str, type: str, amount: str) -> dict:
     return dict(new_item)
 
 
-def get_line_item(name: str, type: str, amount: str) -> dict:
+def get_line_item(line_item_id: int) -> dict:
     """This function retrieves a line item from the database based on the
     provided name, type, and amount.
 
@@ -76,43 +76,33 @@ def get_line_item(name: str, type: str, amount: str) -> dict:
         dict: A dictionary representation of the retrieved line item.
     """
     line_item = session.exec(
-        select(LineItem).where(
-            LineItem.name == name, LineItem.type == type, LineItem.amount == amount
-        )
+        select(LineItem).where(LineItem.id == line_item_id)
     ).first()
 
     return dict(line_item)
 
 
 def update_line_item(
+    id: int,
     name: str,
     type: str,
     amount: str,
-    updated_name: str,
-    updated_type: str,
-    updated_amount: str,
 ) -> None:
     """This function updates a line item in the database based on the provided name,
     type, and amount. The line item is updated with the new values for name, type,
     and amount.
 
     Args:
+        id (int): integer representation of the record id
         name (str): The name of the line item to update.
         type (str): The type of the line item to update.
         amount (str): The amount of the line item to update.
-        updated_name (str): The new name for the line item.
-        updated_type (str): The new type for the line item.
-        updated_amount (str): The new amount for the line item.
     """
-    line_item = session.exec(
-        select(LineItem).where(
-            LineItem.name == name, LineItem.type == type, LineItem.amount == amount
-        )
-    ).first()
+    line_item = session.exec(select(LineItem).where(LineItem.id == id)).first()
 
-    line_item.name = updated_name
-    line_item.type = updated_type
-    line_item.amount = updated_amount
+    line_item.name = name
+    line_item.type = type
+    line_item.amount = amount
 
     session.add(line_item)
     session.commit()

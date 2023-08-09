@@ -18,7 +18,12 @@ my_table: ui.aggrid = ui.aggrid(
         "columnDefs": [
             {"headerName": "Name", "field": "name"},
             {"headerName": "Type", "field": "type"},
-            {"headerName": "Amount", "field": "amount"},
+            {
+                "headerName": "Amount",
+                "field": "amount",
+                "valueFormatter": lambda params: f"${float(params.value):.2f}",
+            },
+            {"headerName": "ID", "field": "id", "hide": True},
         ],
         "rowData": sorted(db.get_all_items(), key=lambda data: data["name"]),
         "rowSelection": "multiple",
@@ -61,14 +66,11 @@ def update_data() -> None:
     displays a notification to the user that the selected item has been updated and closes the
     `edit_data_dialog`.
     """
-
     db.update_line_item(
-        select_data["name"],
-        select_data["type"],
-        select_data["amount"],
-        updated_name=edit_name.value,
-        updated_type=edit_type.value,
-        updated_amount=edit_amount.value,
+        id=select_data["id"],
+        name=edit_name.value,
+        type=edit_type.value,
+        amount=edit_amount.value,
     )
 
     my_table.options["rowData"] = sorted(
@@ -86,7 +88,9 @@ with ui.dialog() as new_data_dialog:
     with ui.card():
         add_name = ui.input(label="Add Name")
         add_type = ui.input(label="Add Type")
-        add_amount = ui.input(label="Add Amount")
+        add_amount = ui.number(label="Add Amount", format="%.2f").on(
+            "blur", lambda: add_amount.update()
+        )
         ui.button("Save New Stream", on_click=add_new_data)
 
 # Dialog for Editing Input
@@ -94,7 +98,9 @@ with ui.dialog() as edit_data_dialog:
     with ui.card():
         edit_name = ui.input(label="Edit Name")
         edit_type = ui.input(label="Edit Type")
-        edit_amount = ui.input(label="Edit Amount")
+        edit_amount = ui.number(label="Edit Amount", format="%.2f").on(
+            "blur", lambda: edit_amount.update()
+        )
         ui.button("Edit Stream", on_click=update_data)
 
 
@@ -122,9 +128,7 @@ async def removedata() -> None:
         ui.notify("No Data was Selected")
         return
 
-    line_item = db.get_line_item(row["name"], row["type"], row["amount"])
-
-    db.delete_line_item(line_item_id=line_item["id"])
+    db.delete_line_item(row["id"])
 
     ui.notify(f"Removed {row['name']}", color="red")
 

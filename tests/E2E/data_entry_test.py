@@ -1,9 +1,10 @@
 import re
+from time import sleep
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
 def test_add_line(playwright: Playwright) -> None:
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
     page.goto("http://localhost:8080/")
@@ -20,6 +21,8 @@ def test_add_line(playwright: Playwright) -> None:
     expect(edit_button).to_be_enabled()
     expect(delete_button).to_be_enabled()
 
+    sleep(2)
+
     # Fill in the form
     add_button.click()
     page.get_by_label("Add Name").click()
@@ -27,7 +30,7 @@ def test_add_line(playwright: Playwright) -> None:
     page.get_by_label("Add Type").click()
     page.get_by_label("Add Type").fill("Test Type")
     page.get_by_label("Add Amount").click()
-    page.get_by_label("Add Amount").fill("Test Amount")
+    page.get_by_label("Add Amount").fill("1")
 
     # Submit the Form in the dialog
     page.get_by_role("button", name="Save New Stream").click()
@@ -36,7 +39,7 @@ def test_add_line(playwright: Playwright) -> None:
     table = page.locator(".ag-center-cols-viewport")
     expect(table).to_contain_text("Test Name")
     expect(table).to_contain_text("Test Type")
-    expect(table).to_contain_text("Test Amount")
+    expect(table).to_contain_text("1.0")
 
     # ---------------------
     context.close()
@@ -44,7 +47,7 @@ def test_add_line(playwright: Playwright) -> None:
 
 
 def test_edit_line(playwright: Playwright) -> None:
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
     page.goto("http://localhost:8080/")
@@ -67,6 +70,8 @@ def test_edit_line(playwright: Playwright) -> None:
     # Wait for the row with the ag-row-selected class to appear
     page.wait_for_selector(".ag-row.ag-row-focus.ag-row-selected")
 
+    sleep(2)
+
     # Click Edit Button
     edit_button.click()
 
@@ -77,7 +82,7 @@ def test_edit_line(playwright: Playwright) -> None:
 
     expect(edit_name).to_have_value("Test Name")
     expect(edit_type).to_have_value("Test Type")
-    expect(edit_amount).to_have_value("Test Amount")
+    expect(edit_amount).to_have_value("1.00")
 
     # Edit Data in the form
     page.get_by_label("Edit Name").click()
@@ -85,7 +90,7 @@ def test_edit_line(playwright: Playwright) -> None:
     page.get_by_label("Edit Type").click()
     page.get_by_label("Edit Type").fill("Test Type_Updated")
     page.get_by_label("Edit Amount").click()
-    page.get_by_label("Edit Amount").fill("Test Amount_Updated")
+    page.get_by_label("Edit Amount").fill("2")
 
     # Submit the Form in the dialog
     page.get_by_role("button", name="Edit Stream").click()
@@ -94,7 +99,7 @@ def test_edit_line(playwright: Playwright) -> None:
     table = page.locator(".ag-center-cols-viewport")
     expect(table).to_contain_text("Test Name_Updated")
     expect(table).to_contain_text("Test Type_Updated")
-    expect(table).to_contain_text("Test Amount_Updated")
+    expect(table).to_contain_text("2.0")
 
     # ---------------------
     context.close()
@@ -102,7 +107,7 @@ def test_edit_line(playwright: Playwright) -> None:
 
 
 def test_delete_line(playwright: Playwright) -> None:
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
     page.goto("http://localhost:8080/")
@@ -125,6 +130,8 @@ def test_delete_line(playwright: Playwright) -> None:
     # Wait for the row with the ag-row-selected class to appear
     page.wait_for_selector(".ag-row.ag-row-focus.ag-row-selected")
 
+    sleep(2)
+
     # Click Edit Button
     delete_button.click()
 
@@ -132,7 +139,7 @@ def test_delete_line(playwright: Playwright) -> None:
     table = page.locator(".ag-center-cols-viewport")
     expect(table).not_to_contain_text("Test Name_Updated")
     expect(table).not_to_contain_text("Test Type_Updated")
-    expect(table).not_to_contain_text("Test Amount_Updated")
+    expect(table).not_to_contain_text("2.0")
 
     # ---------------------
     context.close()
