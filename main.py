@@ -92,9 +92,9 @@ with ui.dialog() as new_data_dialog:
 # Dialog for Editing Input
 with ui.dialog() as edit_data_dialog:
     with ui.card():
-        edit_name = ui.input(label="Add Name")
-        edit_type = ui.input(label="Add Type")
-        edit_amount = ui.input(label="Add Amount")
+        edit_name = ui.input(label="Edit Name")
+        edit_type = ui.input(label="Edit Type")
+        edit_amount = ui.input(label="Edit Amount")
         ui.button("Edit Stream", on_click=update_data)
 
 
@@ -118,9 +118,11 @@ async def removedata() -> None:
 
     row = await my_table.get_selected_row()
 
-    line_item = db.select_line_item(row["name"], row["type"], row["amount"])
+    if not row:
+        ui.notify("No Data was Selected")
+        return
 
-    print(line_item)
+    line_item = db.get_line_item(row["name"], row["type"], row["amount"])
 
     db.delete_line_item(line_item_id=line_item["id"])
 
