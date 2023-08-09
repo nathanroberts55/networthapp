@@ -39,7 +39,7 @@ def get_all_items() -> List[dict]:
     return [dict(item) for item in line_items]
 
 
-def create_line_item(name: str, type: str, amount: str) -> dict:
+def create_line_item(name: str, type: str, status: str, amount: str) -> dict:
     """Creates a new line item in the database and returns it as a dictionary.
 
     This function creates a new `LineItem` object with the specified `name`,
@@ -55,7 +55,7 @@ def create_line_item(name: str, type: str, amount: str) -> dict:
     Returns:
         dict: A dictionary representation of the newly created line item.
     """
-    new_item = LineItem(name=name, type=type, amount=amount)
+    new_item = LineItem(name=name, type=type, status=status, amount=amount)
 
     session.add(new_item)
     session.commit()
@@ -85,6 +85,7 @@ def get_line_item(line_item_id: int) -> dict:
 def update_line_item(
     id: int,
     name: str,
+    status: str,
     type: str,
     amount: str,
 ) -> None:
@@ -102,6 +103,7 @@ def update_line_item(
 
     line_item.name = name
     line_item.type = type
+    line_item.status = status
     line_item.amount = amount
 
     session.add(line_item)
