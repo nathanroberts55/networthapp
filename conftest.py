@@ -3,14 +3,23 @@ import requests
 import subprocess
 import time
 import os
+import sys
 
 
 def server():
-    # Start the server as a separate process and redirect its output to a file
-    python_path: str = None
+    # Setting the Python Path
+    venv_path = "venv"
+    if os.path.exists(venv_path):
+        if sys.platform == "win32":
+            python_path = os.path.join(venv_path, "Scripts", "python.exe")
+        else:
+            python_path = os.path.join(venv_path, "bin", "python")
+    else:
+        python_path = "python"
 
+    # Start the server as a separate process and redirect its output to a file
     with open("server.log", "w") as f:
-        subprocess.Popen(["python", "main.py"], stdout=f, stderr=subprocess.STDOUT)
+        subprocess.Popen([python_path, "main.py"], stdout=f, stderr=subprocess.STDOUT)
 
 
 @pytest.fixture(autouse=True, scope="session")
