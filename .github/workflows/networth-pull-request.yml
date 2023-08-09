@@ -20,7 +20,5 @@ jobs:
           pip install -r requirements.txt
       - name: Ensure browsers are installed
         run: python -m playwright install --with-deps
-      - name: Run Networth App
-        run: python main.py
       - name: Run Tests
         run: pytest

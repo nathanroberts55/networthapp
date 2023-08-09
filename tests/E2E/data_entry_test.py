@@ -1,5 +1,6 @@
 import re
-import asyncio
+import os
+import subprocess
 import time
 from playwright.sync_api import Playwright, sync_playwright, expect
 
@@ -8,7 +9,7 @@ def test_add_line(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
-    page.goto("http://127.0.0.1:8080/")
+    page.goto("http://localhost:8080/")
 
     # Page Title Check
     expect(page).to_have_title(re.compile("Net Worth Tracker"))
@@ -49,7 +50,7 @@ def test_edit_line(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
-    page.goto("http://127.0.0.1:8080/")
+    page.goto("http://localhost:8080/")
 
     # Page Title Check
     expect(page).to_have_title(re.compile("Net Worth Tracker"))
@@ -107,7 +108,7 @@ def test_delete_line(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
-    page.goto("http://127.0.0.1:8080/")
+    page.goto("http://localhost:8080/")
 
     # Page Title Check
     expect(page).to_have_title(re.compile("Net Worth Tracker"))
