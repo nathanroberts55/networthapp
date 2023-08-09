@@ -118,9 +118,11 @@ async def removedata() -> None:
 
     row = await my_table.get_selected_row()
 
-    line_item = db.select_line_item(row["name"], row["type"], row["amount"])
+    if not row:
+        ui.notify("No Data was Selected")
+        return
 
-    print(line_item)
+    line_item = db.get_line_item(row["name"], row["type"], row["amount"])
 
     db.delete_line_item(line_item_id=line_item["id"])
 
