@@ -18,6 +18,7 @@ my_table: ui.aggrid = ui.aggrid(
         "columnDefs": [
             {"headerName": "Name", "field": "name"},
             {"headerName": "Type", "field": "type"},
+            {"headerName": "Status", "field": "status"},
             {
                 "headerName": "Amount",
                 "field": "amount",
@@ -43,7 +44,10 @@ def add_new_data() -> None:
     """
 
     db.create_line_item(
-        name=add_name.value, type=add_type.value, amount=add_amount.value
+        name=add_name.value,
+        type=add_type.value,
+        status=add_status.value,
+        amount=add_amount.value,
     )
 
     my_table.options["rowData"] = sorted(
@@ -52,7 +56,12 @@ def add_new_data() -> None:
 
     ui.notify(f"{add_name.value} Added!", color="green")
 
+    # Close Dialog and Reset Values (inputs will reset themselves)
     new_data_dialog.close()
+    add_status.set_value(None)
+    add_amount.set_value(None)
+
+    # Update Table
     my_table.update()
 
 
@@ -70,6 +79,7 @@ def update_data() -> None:
         id=select_data["id"],
         name=edit_name.value,
         type=edit_type.value,
+        status=edit_status.value,
         amount=edit_amount.value,
     )
 
@@ -88,7 +98,10 @@ with ui.dialog() as new_data_dialog:
     with ui.card():
         add_name = ui.input(label="Add Name")
         add_type = ui.input(label="Add Type")
-        add_amount = ui.number(label="Add Amount", format="%.2f").on(
+        add_status = ui.select(
+            label="Add Status", options=["Asset", "Liability"], value=None
+        ).classes("w-full")
+        add_amount = ui.number(label="Add Amount", format="%.2f", value=None).on(
             "blur", lambda: add_amount.update()
         )
         ui.button("Save New Stream", on_click=add_new_data)
@@ -98,6 +111,7 @@ with ui.dialog() as edit_data_dialog:
     with ui.card():
         edit_name = ui.input(label="Edit Name")
         edit_type = ui.input(label="Edit Type")
+        edit_status = ui.select(label="Edit Status", options=["Asset", "Liability"])
         edit_amount = ui.number(label="Edit Amount", format="%.2f").on(
             "blur", lambda: edit_amount.update()
         )
@@ -157,6 +171,7 @@ async def editdata() -> None:
 
     edit_name.set_value(select_data["name"])
     edit_type.set_value(select_data["type"])
+    edit_status.set_value(select_data["status"])
     edit_amount.set_value(select_data["amount"])
 
     edit_data_dialog.open()
