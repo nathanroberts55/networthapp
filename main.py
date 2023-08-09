@@ -92,9 +92,9 @@ with ui.dialog() as new_data_dialog:
 # Dialog for Editing Input
 with ui.dialog() as edit_data_dialog:
     with ui.card():
-        edit_name = ui.input(label="Add Name")
-        edit_type = ui.input(label="Add Type")
-        edit_amount = ui.input(label="Add Amount")
+        edit_name = ui.input(label="Edit Name")
+        edit_type = ui.input(label="Edit Type")
+        edit_amount = ui.input(label="Edit Amount")
         ui.button("Edit Stream", on_click=update_data)
 
 

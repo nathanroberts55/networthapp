@@ -1,7 +1,4 @@
 import re
-import os
-import subprocess
-import time
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
@@ -74,21 +71,21 @@ def test_edit_line(playwright: Playwright) -> None:
     edit_button.click()
 
     # See if the edit form is prepopulated
-    edit_name = page.get_by_label("Add Name")
-    edit_type = page.get_by_label("Add Type")
-    edit_amount = page.get_by_label("Add Amount")
+    edit_name = page.get_by_label("Edit Name")
+    edit_type = page.get_by_label("Edit Type")
+    edit_amount = page.get_by_label("Edit Amount")
 
     expect(edit_name).to_have_value("Test Name")
     expect(edit_type).to_have_value("Test Type")
     expect(edit_amount).to_have_value("Test Amount")
 
     # Edit Data in the form
-    page.get_by_label("Add Name").click()
-    page.get_by_label("Add Name").fill("Test Name_Updated")
-    page.get_by_label("Add Type").click()
-    page.get_by_label("Add Type").fill("Test Type_Updated")
-    page.get_by_label("Add Amount").click()
-    page.get_by_label("Add Amount").fill("Test Amount_Updated")
+    page.get_by_label("Edit Name").click()
+    page.get_by_label("Edit Name").fill("Test Name_Updated")
+    page.get_by_label("Edit Type").click()
+    page.get_by_label("Edit Type").fill("Test Type_Updated")
+    page.get_by_label("Edit Amount").click()
+    page.get_by_label("Edit Amount").fill("Test Amount_Updated")
 
     # Submit the Form in the dialog
     page.get_by_role("button", name="Edit Stream").click()
