@@ -12,8 +12,6 @@ def server():
     if os.path.exists(venv_path):
         if sys.platform == "win32":
             python_path = os.path.join(venv_path, "Scripts", "python.exe")
-        else:
-            python_path = os.path.join(venv_path, "bin", "python")
     else:
         python_path = "python"
 
