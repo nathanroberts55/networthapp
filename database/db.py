@@ -1,4 +1,5 @@
 from typing import List
+import pandas as pd
 from sqlmodel import SQLModel, Session, create_engine, select
 from models.line_item import LineItem
 
@@ -121,3 +122,15 @@ def delete_line_item(line_item_id: int) -> None:
 
     session.delete(line_item)
     session.commit()
+
+
+def get_dataframe() -> pd.DataFrame:
+    data = get_all_items()
+    df = pd.DataFrame(data)
+
+    # Set the data types of the columns
+    df = df.astype(
+        {"id": "int", "name": "str", "status": "str", "type": "str", "amount": "float"}
+    )
+
+    return df
