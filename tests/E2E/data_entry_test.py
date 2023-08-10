@@ -29,6 +29,8 @@ def test_add_line(playwright: Playwright) -> None:
     page.get_by_label("Add Name").fill("Test Name")
     page.get_by_label("Add Type").click()
     page.get_by_label("Add Type").fill("Test Type")
+    page.get_by_text("arrow_drop_down").click()
+    page.get_by_role("option", name="Asset").locator("div").nth(1).click()
     page.get_by_label("Add Amount").click()
     page.get_by_label("Add Amount").fill("1")
 
@@ -39,7 +41,8 @@ def test_add_line(playwright: Playwright) -> None:
     table = page.locator(".ag-center-cols-viewport")
     expect(table).to_contain_text("Test Name")
     expect(table).to_contain_text("Test Type")
-    expect(table).to_contain_text("1.0")
+    expect(table).to_contain_text("Asset")
+    expect(table).to_contain_text("1.00")
 
     # ---------------------
     context.close()
@@ -70,7 +73,7 @@ def test_edit_line(playwright: Playwright) -> None:
     # Wait for the row with the ag-row-selected class to appear
     page.wait_for_selector(".ag-row.ag-row-focus.ag-row-selected")
 
-    sleep(2)
+    sleep(3)
 
     # Click Edit Button
     edit_button.click()
@@ -78,16 +81,20 @@ def test_edit_line(playwright: Playwright) -> None:
     # See if the edit form is prepopulated
     edit_name = page.get_by_label("Edit Name")
     edit_type = page.get_by_label("Edit Type")
+    edit_status = page.get_by_label("Edit Status")
     edit_amount = page.get_by_label("Edit Amount")
 
     expect(edit_name).to_have_value("Test Name")
     expect(edit_type).to_have_value("Test Type")
+    expect(edit_status).to_have_value("Asset")
     expect(edit_amount).to_have_value("1.00")
 
     # Edit Data in the form
     page.get_by_label("Edit Name").click()
     page.get_by_label("Edit Name").fill("Test Name_Updated")
     page.get_by_label("Edit Type").click()
+    page.get_by_text("arrow_drop_down").click()
+    page.get_by_role("option", name="Liability").locator("div").nth(1).click()
     page.get_by_label("Edit Type").fill("Test Type_Updated")
     page.get_by_label("Edit Amount").click()
     page.get_by_label("Edit Amount").fill("2")
@@ -99,7 +106,7 @@ def test_edit_line(playwright: Playwright) -> None:
     table = page.locator(".ag-center-cols-viewport")
     expect(table).to_contain_text("Test Name_Updated")
     expect(table).to_contain_text("Test Type_Updated")
-    expect(table).to_contain_text("2.0")
+    expect(table).to_contain_text("2.00")
 
     # ---------------------
     context.close()
@@ -130,7 +137,7 @@ def test_delete_line(playwright: Playwright) -> None:
     # Wait for the row with the ag-row-selected class to appear
     page.wait_for_selector(".ag-row.ag-row-focus.ag-row-selected")
 
-    sleep(2)
+    sleep(3)
 
     # Click Edit Button
     delete_button.click()
