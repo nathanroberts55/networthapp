@@ -1,7 +1,7 @@
 from typing import List
 import pandas as pd
-from sqlmodel import SQLModel, Session, create_engine, select
 from models.line_item import LineItem
+from sqlmodel import SQLModel, Session, create_engine, select
 
 sqlite_file_name = "networth.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
@@ -36,8 +36,9 @@ def get_all_items() -> List[dict]:
         List[dict]: A list of dictionaries, where each dictionary represents a line item
                     in the database.
     """
-    line_items = session.exec(select(LineItem)).all()
-    return [dict(item) for item in line_items]
+    with session:
+        line_items = session.exec(select(LineItem)).all()
+        return [dict(item) for item in line_items]
 
 
 def create_line_item(name: str, type: str, status: str, amount: str) -> dict:
@@ -56,12 +57,13 @@ def create_line_item(name: str, type: str, status: str, amount: str) -> dict:
     Returns:
         dict: A dictionary representation of the newly created line item.
     """
-    new_item = LineItem(name=name, type=type, status=status, amount=amount)
+    with session:
+        new_item = LineItem(name=name, type=type, status=status, amount=amount)
 
-    session.add(new_item)
-    session.commit()
-    session.refresh(new_item)
-    return dict(new_item)
+        session.add(new_item)
+        session.commit()
+        session.refresh(new_item)
+        return dict(new_item)
 
 
 def get_line_item(line_item_id: int) -> dict:
@@ -76,11 +78,12 @@ def get_line_item(line_item_id: int) -> dict:
     Returns:
         dict: A dictionary representation of the retrieved line item.
     """
-    line_item = session.exec(
-        select(LineItem).where(LineItem.id == line_item_id)
-    ).first()
+    with session:
+        line_item = session.exec(
+            select(LineItem).where(LineItem.id == line_item_id)
+        ).first()
 
-    return dict(line_item)
+        return dict(line_item)
 
 
 def update_line_item(
@@ -100,16 +103,17 @@ def update_line_item(
         type (str): The type of the line item to update.
         amount (str): The amount of the line item to update.
     """
-    line_item = session.exec(select(LineItem).where(LineItem.id == id)).first()
+    with session:
+        line_item = session.exec(select(LineItem).where(LineItem.id == id)).first()
 
-    line_item.name = name
-    line_item.type = type
-    line_item.status = status
-    line_item.amount = amount
+        line_item.name = name
+        line_item.type = type
+        line_item.status = status
+        line_item.amount = amount
 
-    session.add(line_item)
-    session.commit()
-    session.refresh(line_item)
+        session.add(line_item)
+        session.commit()
+        session.refresh(line_item)
 
 
 def delete_line_item(line_item_id: int) -> None:
@@ -118,10 +122,13 @@ def delete_line_item(line_item_id: int) -> None:
     Args:
         line_item_id (int): The ID of the line item to delete.
     """
-    line_item = session.exec(select(LineItem).where(LineItem.id == line_item_id)).one()
+    with session:
+        line_item = session.exec(
+            select(LineItem).where(LineItem.id == line_item_id)
+        ).one()
 
-    session.delete(line_item)
-    session.commit()
+        session.delete(line_item)
+        session.commit()
 
 
 def get_dataframe() -> pd.DataFrame:
