@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from nicegui import ui
 from database import db
 
@@ -11,7 +12,14 @@ if not os.path.exists("networth.db"):
 
 select_data = []
 my_data = db.get_all_items()
+line_df = db.get_dataframe()
 
+# App Title
+ui.label("Net Worth Calculator").classes("text-4xl")
+ui.splitter(horizontal=True)
+
+# Data Entry and Table
+ui.label("Line Items").classes("text-2xl")
 my_table: ui.aggrid = ui.aggrid(
     {
         "defaultColDef": {"flex": 1},
@@ -47,7 +55,7 @@ def add_new_data() -> None:
         name=add_name.value,
         type=add_type.value,
         status=add_status.value,
-        amount=add_amount.value,
+        amount=f"{float(add_amount.value):.2f}",
     )
 
     my_table.options["rowData"] = sorted(
@@ -80,7 +88,7 @@ def update_data() -> None:
         name=edit_name.value,
         type=edit_type.value,
         status=edit_status.value,
-        amount=edit_amount.value,
+        amount=f"{float(edit_amount.value):.2f}",
     )
 
     my_table.options["rowData"] = sorted(
@@ -111,7 +119,9 @@ with ui.dialog() as edit_data_dialog:
     with ui.card():
         edit_name = ui.input(label="Edit Name")
         edit_type = ui.input(label="Edit Type")
-        edit_status = ui.select(label="Edit Status", options=["Asset", "Liability"])
+        edit_status = ui.select(
+            label="Edit Status", options=["Asset", "Liability"]
+        ).classes("w-full")
         edit_amount = ui.number(label="Edit Amount", format="%.2f").on(
             "blur", lambda: edit_amount.update()
         )
@@ -183,5 +193,24 @@ with ui.row() as button_row:
     ui.button("Edit", on_click=editdata)
     ui.button("Delete", color="red", on_click=removedata)
 
+ui.splitter(horizontal=True)
+
+# Reporting
+ui.label("Net Worth Breakdown").classes("text-2xl")
+
+sum_liabilties = line_df.loc[line_df["status"] == "Liability", "amount"].sum()
+sum_assets = line_df.loc[line_df["status"] == "Asset", "amount"].sum()
+net_worth = sum_assets - sum_liabilties
+
+with ui.row().classes("w-full justify-evenly") as tile_row:
+    with ui.card().classes("w-1/4 place-content-center") as total_items:
+        ui.label("Net Worth").classes("text-xl").classes("m-auto")
+        ui.label(f"${float(net_worth):,.2f}").classes("text-center").classes("m-auto")
+    with ui.card().classes("w-1/4 place-content-center") as total_assets:
+        ui.label("Total Assets").classes("text-xl").classes("m-auto")
+        ui.label(f"${float(sum_assets):,.2f}").classes("m-auto")
+    with ui.card().classes("w-1/4 place-content-center") as total_liabilities:
+        ui.label("Total Liabilities").classes("text-xl").classes("m-auto")
+        ui.label(f"${float(sum_liabilties):,.2f}").classes("m-auto")
 
 ui.run(title="Net Worth Tracker", favicon="assets\\asset.png")
