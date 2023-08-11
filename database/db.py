@@ -136,8 +136,15 @@ def get_dataframe() -> pd.DataFrame:
     df = pd.DataFrame(data)
 
     # Set the data types of the columns
-    df = df.astype(
-        {"id": "int", "name": "str", "status": "str", "type": "str", "amount": "float"}
-    )
+    if not df.empty:
+        df = df.astype(
+            {
+                "id": "int",
+                "name": "str",
+                "status": "str",
+                "type": "str",
+                "amount": "float",
+            }
+        )
 
     return df

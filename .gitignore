@@ -206,5 +206,6 @@ pip-selfcheck.json
 
 # Project Specific
 networth.db
+*.iss
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,venv
