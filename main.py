@@ -1,11 +1,14 @@
 import os
 import pandas as pd
 import plotly.graph_objects as go
-from nicegui import ui
+from nicegui import app, ui
 from database import db
 
 # ============== Configuration =======================
 ui.dark_mode().enable()
+
+app.native.window_args["resizable"] = True
+app.native.start_args["debug"] = False
 
 # Initialize the SQLite Database
 if not os.path.exists("networth.db"):
@@ -164,50 +167,66 @@ async def editdata() -> None:
 # ============== UI Functions =====================
 @ui.refreshable
 def net_composition_plot() -> None:
-    line_df = db.get_dataframe()
-    fig = go.Figure(
-        data=[
-            go.Pie(
-                labels=line_df["name"],
-                values=line_df["amount"],
-                hole=0.5,
-                title="Net Worth Composition",
-                titleposition="top center",
-                marker=dict(colors=colors),
-            )
-        ]
-    )
+    line_df: pd.DataFrame = db.get_dataframe()
+    if line_df.empty:
+        ui.label("")
+    else:
+        fig = go.Figure(
+            data=[
+                go.Pie(
+                    labels=line_df["name"],
+                    values=line_df["amount"],
+                    hole=0.5,
+                    title="Net Worth Composition",
+                    titleposition="top center",
+                    marker=dict(colors=colors),
+                )
+            ]
+        )
 
-    # Set the background color to black
-    fig.update_layout(
-        plot_bgcolor="#121212", paper_bgcolor="#121212", font={"color": "white"}
-    )
+        # Set the background color to black
+        fig.update_layout(
+            plot_bgcolor="#121212", paper_bgcolor="#121212", font={"color": "white"}
+        )
 
-    # Set the text color to white
-    fig.update_traces(textfont=dict(color="white"))
+        # Set the text color to white
+        fig.update_traces(textfont=dict(color="white"))
 
-    ui.plotly(fig).classes("w-7/8 m-auto")
+        ui.plotly(fig).classes("w-5/6 h-screen m-auto")
 
 
 @ui.refreshable
 def net_breakdown_cards() -> None:
     line_df = db.get_dataframe()
-    sum_liabilties = line_df.loc[line_df["status"] == "Liability", "amount"].sum()
-    sum_assets = line_df.loc[line_df["status"] == "Asset", "amount"].sum()
-    net_worth = sum_assets - sum_liabilties
 
-    with ui.row().classes("w-full justify-evenly") as tile_row:
-        with ui.card().classes("w-1/4 place-content-center") as total_items:
-            ui.label("Net Worth").classes("text-xl").classes("m-auto")
-            ui.label(f"${float(net_worth):,.2f}").classes("text-center").classes(
-                "m-auto"
-            )
-        with ui.card().classes("w-1/4 place-content-center") as total_assets:
-            ui.label("Total Assets").classes("text-xl").classes("m-auto")
-            ui.label(f"${float(sum_assets):,.2f}").classes("m-auto")
-        with ui.card().classes("w-1/4 place-content-center") as total_liabilities:
-            ui.label("Total Liabilities").classes("text-xl").classes("m-auto")
-            ui.label(f"${float(sum_liabilties):,.2f}").classes("m-auto")
+    if line_df.empty:
+        with ui.row().classes("w-full justify-evenly") as tile_row:
+            with ui.card().classes("w-1/4 place-content-center") as total_items:
+                ui.label("Net Worth").classes("text-xl").classes("m-auto")
+                ui.label(f"${float(0):,.2f}").classes("text-center").classes("m-auto")
+            with ui.card().classes("w-1/4 place-content-center") as total_assets:
+                ui.label("Total Assets").classes("text-xl").classes("m-auto")
+                ui.label(f"${float(0):,.2f}").classes("m-auto")
+            with ui.card().classes("w-1/4 place-content-center") as total_liabilities:
+                ui.label("Total Liabilities").classes("text-xl").classes("m-auto")
+                ui.label(f"${float(0):,.2f}").classes("m-auto")
+    else:
+        sum_liabilties = line_df.loc[line_df["status"] == "Liability", "amount"].sum()
+        sum_assets = line_df.loc[line_df["status"] == "Asset", "amount"].sum()
+        net_worth = sum_assets - sum_liabilties
+
+        with ui.row().classes("w-full justify-evenly") as tile_row:
+            with ui.card().classes("w-1/4 place-content-center") as total_items:
+                ui.label("Net Worth").classes("text-xl").classes("m-auto")
+                ui.label(f"${float(net_worth):,.2f}").classes("text-center").classes(
+                    "m-auto"
+                )
+            with ui.card().classes("w-1/4 place-content-center") as total_assets:
+                ui.label("Total Assets").classes("text-xl").classes("m-auto")
+                ui.label(f"${float(sum_assets):,.2f}").classes("m-auto")
+            with ui.card().classes("w-1/4 place-content-center") as total_liabilities:
+                ui.label("Total Liabilities").classes("text-xl").classes("m-auto")
+                ui.label(f"${float(sum_liabilties):,.2f}").classes("m-auto")
 
 
 # =============== Main UI ======================
@@ -275,4 +294,11 @@ ui.label("Net Worth Breakdown").classes("text-2xl")
 net_breakdown_cards()
 net_composition_plot()
 
-ui.run(title="Net Worth Tracker", favicon="assets\\asset.png")
+ui.run(
+    native=True,
+    window_size=(1200, 800),
+    title="Net Worth Tracker",
+    favicon="assets\\assst.ico",
+    fullscreen=False,
+    reload=False,
+)
